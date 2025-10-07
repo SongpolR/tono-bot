@@ -6,12 +6,14 @@ const app = express();
 
 // Security headers (no CSP needed for pure API)
 app.disable('x-powered-by');
-app.use(helmet({
+app.use(
+  helmet({
     xssFilter: true,
     noSniff: true,
     hidePoweredBy: true,
-    frameguard: {action: 'deny'}
-}));
+    frameguard: { action: 'deny' },
+  })
+);
 
 // If behind reverse proxy / load balancer
 app.set('trust proxy', true);

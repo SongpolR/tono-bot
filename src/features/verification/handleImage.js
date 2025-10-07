@@ -26,7 +26,8 @@ export async function handleImage(event) {
       } else if (
         result.code === 1008 ||
         result.code === 1011 ||
-        result.code === 1012
+        result.code === 1012 ||
+        result.code === 1014
       ) {
         await pushSafe(targetId, buildFlexInvalid(result.message, info));
       }
