@@ -1,10 +1,8 @@
 import { bankLabel, fmtTHB, formatWhen, mask } from './format.js';
+import { tonoSay } from './voice.js';
 
 const text = (t, opts = {}) => ({ type: 'text', text: t, ...opts });
-
-function flex(altText, bubble) {
-  return { type: 'flex', altText, contents: bubble };
-}
+const flex = (altText, bubble) => ({ type: 'flex', altText, contents: bubble });
 
 function row(label, left, right) {
   return {
@@ -58,15 +56,18 @@ export function buildFlexVerified(info = {}) {
       layout: 'vertical',
       spacing: 'md',
       contents: [
-        text('สลิปถูกต้อง', { weight: 'bold', color: '#16A34A', size: 'md' }),
-        text(`฿ ${amount}`, { weight: 'bold', size: 'xxl' }),
-        text(`รับเงินเรียบร้อย ${when}`, {
-          size: 'sm',
-          color: '#6B7280',
-          wrap: true,
+        text(tonoSay.okTitle(), {
+          weight: 'bold',
+          color: '#16A34A',
+          size: 'md',
         }),
+        text(`฿ ${amount}`, { weight: 'bold', size: 'xxl' }),
+        text(tonoSay.okSub(when), { size: 'sm', color: '#6B7280', wrap: true }),
+
+        // bank info
         kv('ธนาคารผู้โอน', bankLabel(info.sending_bank_code)),
         kv('ธนาคารผู้รับ', bankLabel(info.receiving_bank_code)),
+
         { type: 'separator', margin: 'md' },
         row(
           'ชื่อผู้โอน',
@@ -81,7 +82,7 @@ export function buildFlexVerified(info = {}) {
       ],
     },
   };
-  return flex(`สลิปถูกต้อง ฿${amount}`, bubble);
+  return flex(`Tono: สลิปผ่าน ฿${amount}`, bubble);
 }
 
 // ⏳ pending
@@ -93,36 +94,29 @@ export function buildFlexPending() {
       layout: 'vertical',
       spacing: 'md',
       contents: [
-        text('รอตรวจสอบสลิป', { weight: 'bold', color: '#F59E0B' }),
-        text(
-          'บางธนาคารอาจใช้เวลาประมาณ 2 นาที โปรดกดปุ่มเพื่อตรวจสอบอีกครั้ง',
-          {
-            size: 'sm',
-            color: '#6B7280',
-            wrap: true,
-          }
-        ),
+        text(tonoSay.pendingTitle(), { weight: 'bold', color: '#F59E0B' }),
+        text(tonoSay.pendingSub(), {
+          size: 'sm',
+          color: '#6B7280',
+          wrap: true,
+        }),
       ],
     },
   };
-  return flex('รอตรวจสอบสลิป', bubble);
+  return flex('Tono: รอตรวจสอบสลิป', bubble);
 }
 
 // ❌ invalid
 export function buildFlexInvalid(msg) {
   const parts = [
-    text('ข้อมูลสลิปไม่ถูกต้อง', { weight: 'bold', color: '#DC2626' }),
-    text(
-      msg ||
-        'กรุณาตรวจสอบข้อมูลในสลิปอีกครั้ง หรืออาจเป็นสลิปหมดอายุ/ธนาคารต้นทางมีปัญหา',
-      {
-        size: 'sm',
-        color: '#6B7280',
-        wrap: true,
-      }
-    ),
+    text(tonoSay.invalidTitle(), { weight: 'bold', color: '#DC2626' }),
+    text(msg || tonoSay.invalidSub(), {
+      size: 'sm',
+      color: '#6B7280',
+      wrap: true,
+    }),
   ];
-  return flex('ข้อมูลสลิปไม่ถูกต้อง', {
+  return flex('Tono: สลิปมีปัญหา', {
     type: 'bubble',
     body: { type: 'box', layout: 'vertical', spacing: 'md', contents: parts },
   });

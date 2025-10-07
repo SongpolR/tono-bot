@@ -21,11 +21,14 @@ export async function handleImage(event) {
     const ref = info.transaction_ref || null;
 
     if (!result.ok) {
-      if (/รอตรวจสอบ|pending/i.test(result.message || '')) {
+      if (result.code === 1009 || result.code === 1010) {
         await pushSafe(targetId, buildFlexPending(ref, info));
-      } else {
-        return;
-        // await pushSafe(targetId, buildFlexInvalid(result.message, info));
+      } else if (
+        result.code === 1008 ||
+        result.code === 1011 ||
+        result.code === 1012
+      ) {
+        await pushSafe(targetId, buildFlexInvalid(result.message, info));
       }
       return;
     }

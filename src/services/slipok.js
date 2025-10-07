@@ -87,7 +87,7 @@ export function normalizeSlipOk(json) {
 
   return {
     ok,
-    errorCode: ok ? null : null, // this schema doesn't include numeric error codes
+    code: json?.code || null, // this schema doesn't include numeric error codes
     message: ok
       ? null
       : json?.message || d?.message || 'Slip verification failed.',
