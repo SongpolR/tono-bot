@@ -1,0 +1,9 @@
+{
+  "name": "budget-enforcer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "googleapis": "^127.0.0"
+  }
+}
