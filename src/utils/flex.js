@@ -121,3 +121,39 @@ export function buildFlexInvalid(msg) {
     body: { type: 'box', layout: 'vertical', spacing: 'md', contents: parts },
   });
 }
+
+export function buildFlexQuotaZero(quota) {
+  return flex('Tono: โควต้า SlipOK หมดแล้ว', {
+    type: 'bubble',
+    body: {
+      type: 'box',
+      layout: 'vertical',
+      spacing: 'md',
+      contents: [
+        text(`โฮ่ง! โควต้าตรวจสลิปหมดแล้วครับ ${quota} ❌`, {
+          weight: 'bold',
+          color: '#DC2626',
+          wrap: true,
+        }),
+      ],
+    },
+  });
+}
+
+export function buildFlexQuotaLow() {
+  return flex('Tono: โควต้าใกล้หมด', {
+    type: 'bubble',
+    body: {
+      type: 'box',
+      layout: 'vertical',
+      spacing: 'md',
+      contents: [
+        text('งื้ด… โควต้าตรวจสลิปใกล้หมดแล้วนะครับ ⚠️', {
+          weight: 'bold',
+          color: '#F59E0B',
+          wrap: true,
+        }),
+      ],
+    },
+  });
+}

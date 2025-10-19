@@ -26,7 +26,7 @@ export async function callSlipOkWithImage(imgBuffer) {
   });
 }
 
-/** Normalizer for HTTP 200 { success, data{...} } shape */
+/** Normalizer for HTTP 200 [success, data{...}] shape */
 export function normalizeSlipOk(json) {
   // Expected shape:
   // {
@@ -98,4 +98,28 @@ export function normalizeSlipOk(json) {
 
 export function sha256(buf) {
   return crypto.createHash('sha256').update(buf).digest('hex');
+}
+
+// --- Quota check ---
+export async function getSlipOkQuota() {
+  const resp = await fetch(
+    `https://api.slipok.com/api/line/apikey/${env.SLIPOK_BRANCH_ID}/quota`,
+    {
+      method: 'GET',
+      headers: { 'x-authorization': env.SLIPOK_API_KEY },
+    }
+  );
+
+  // Don’t throw: we want graceful behavior if quota API is flaky
+  const json = await resp.json().catch(() => ({}));
+
+  // Normalize various possible shapes:
+  // prefer { quota } if present
+  const data = json?.data ?? json ?? {};
+
+  return {
+    ok: json.success,
+    quota: data.quota || 0,
+    raw: json,
+  };
 }

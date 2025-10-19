@@ -3,16 +3,32 @@ import {
   pushSafe,
   downloadLineImage,
 } from '../../services/lineClient.js';
-import { callSlipOkWithImage, sha256 } from '../../services/slipok.js';
+import {
+  callSlipOkWithImage,
+  getSlipOkQuota,
+  sha256,
+} from '../../services/slipok.js';
 import {
   buildFlexInvalid,
   buildFlexPending,
+  buildFlexQuotaLow,
+  buildFlexQuotaZero,
   buildFlexVerified,
 } from '../../utils/flex.js';
+import { env } from '../../config/env.js';
 
 export async function handleImage(event) {
   const targetId = getSourceTargetId(event);
   try {
+    const quotaResult = await getSlipOkQuota();
+    if (quotaResult.quota <= 0) {
+      await pushSafe(targetId, buildFlexQuotaZero(quotaResult.quota));
+      return; // stop flow entirely
+    }
+    if (quotaResult.quota < env.SLIPOK_QUOTA_WARN_THRESHOLD) {
+      await pushSafe(targetId, buildFlexQuotaLow());
+    }
+
     const img = await downloadLineImage(event.message.id);
 
     const result = await callSlipOkWithImage(img);

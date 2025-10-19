@@ -4,6 +4,7 @@ export const env = {
   LINE_CHANNEL_SECRET: required('LINE_CHANNEL_SECRET'),
   SLIPOK_API_KEY: required('SLIPOK_API_KEY'),
   SLIPOK_BRANCH_ID: required('SLIPOK_BRANCH_ID'),
+  SLIPOK_QUOTA_WARN_THRESHOLD: process.env.SLIPOK_QUOTA_WARN_THRESHOLD || 10,
 };
 
 function required(name) {
