@@ -22,7 +22,7 @@ export async function handleImage(event) {
   try {
     const quotaResult = await getSlipOkQuota();
     if (quotaResult.quota <= 0) {
-      await pushSafe(targetId, buildFlexQuotaZero(quotaResult.quota));
+      await pushSafe(targetId, buildFlexQuotaZero());
       return; // stop flow entirely
     }
     if (quotaResult.quota < env.SLIPOK_QUOTA_WARN_THRESHOLD) {

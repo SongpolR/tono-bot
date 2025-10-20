@@ -122,7 +122,7 @@ export function buildFlexInvalid(msg) {
   });
 }
 
-export function buildFlexQuotaZero(quota) {
+export function buildFlexQuotaZero() {
   return flex('Tono: โควต้า SlipOK หมดแล้ว', {
     type: 'bubble',
     body: {
@@ -130,7 +130,7 @@ export function buildFlexQuotaZero(quota) {
       layout: 'vertical',
       spacing: 'md',
       contents: [
-        text(`โฮ่ง! โควต้าตรวจสลิปหมดแล้วครับ ${quota} ❌`, {
+        text(`โฮ่ง! โควต้าตรวจสลิปหมดแล้วครับ ❌`, {
           weight: 'bold',
           color: '#DC2626',
           wrap: true,
