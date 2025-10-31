@@ -122,7 +122,7 @@ export function buildFlexInvalid(msg) {
   });
 }
 
-export function buildFlexQuotaZero() {
+export function buildFlexSlipOKQuotaZero() {
   return flex('Tono: โควต้า SlipOK หมดแล้ว', {
     type: 'bubble',
     body: {
@@ -130,7 +130,7 @@ export function buildFlexQuotaZero() {
       layout: 'vertical',
       spacing: 'md',
       contents: [
-        text(`โฮ่ง! โควต้าตรวจสลิปหมดแล้วครับ ❌`, {
+        text('โฮ่ง! โควต้าตรวจสลิปหมดแล้วครับ ❌', {
           weight: 'bold',
           color: '#DC2626',
           wrap: true,
@@ -140,7 +140,7 @@ export function buildFlexQuotaZero() {
   });
 }
 
-export function buildFlexQuotaLow() {
+export function buildFlexSlipOKQuotaLow() {
   return flex('Tono: โควต้าใกล้หมด', {
     type: 'bubble',
     body: {
@@ -151,6 +151,54 @@ export function buildFlexQuotaLow() {
         text('งื้ด… โควต้าตรวจสลิปใกล้หมดแล้วนะครับ ⚠️', {
           weight: 'bold',
           color: '#F59E0B',
+          wrap: true,
+        }),
+      ],
+    },
+  });
+}
+
+// LINE quota = 0
+export function buildFlexLINEMessagingAPIQuotaZero() {
+  return flex('Tono: โควต้า LINE หมดแล้ว', {
+    type: 'bubble',
+    body: {
+      type: 'box',
+      layout: 'vertical',
+      spacing: 'md',
+      contents: [
+        text('โฮ่ง! โควต้า LINE Messaging วันนี้หมดแล้วครับ ❌', {
+          weight: 'bold',
+          color: '#DC2626',
+          wrap: true,
+        }),
+        text(
+          'Tono ส่งข้อความเพิ่มไม่ได้ตอนนี้ กรุณาลองใหม่พรุ่งนี้หรืออัปเกรดแพ็กเกจ',
+          { size: 'sm', color: '#6B7280', wrap: true }
+        ),
+      ],
+    },
+  });
+}
+
+// LINE quota low (< threshold)
+export function buildFlexLINEMessagingAPIQuotaLow(remaining) {
+  const rem = Number.isFinite(remaining) ? remaining : '?';
+  return flex('Tono: โควต้า LINE ใกล้หมด', {
+    type: 'bubble',
+    body: {
+      type: 'box',
+      layout: 'vertical',
+      spacing: 'md',
+      contents: [
+        text('งื้ด… โควต้า LINE ใกล้หมดแล้วครับ ⚠️', {
+          weight: 'bold',
+          color: '#F59E0B',
+          wrap: true,
+        }),
+        text(`คงเหลือ ${rem} ข้อความวันนี้ โปรดใช้อย่างประหยัดน้า`, {
+          size: 'sm',
+          color: '#6B7280',
           wrap: true,
         }),
       ],

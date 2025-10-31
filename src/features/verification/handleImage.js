@@ -2,6 +2,7 @@ import {
   getSourceTargetId,
   pushSafe,
   downloadLineImage,
+  getLINEMessagingAPIQuota,
 } from '../../services/lineClient.js';
 import {
   callSlipOkWithImage,
@@ -10,9 +11,11 @@ import {
 } from '../../services/slipok.js';
 import {
   buildFlexInvalid,
+  buildFlexLINEMessagingAPIQuotaLow,
+  buildFlexLINEMessagingAPIQuotaZero,
   buildFlexPending,
-  buildFlexQuotaLow,
-  buildFlexQuotaZero,
+  buildFlexSlipOKQuotaLow,
+  buildFlexSlipOKQuotaZero,
   buildFlexVerified,
 } from '../../utils/flex.js';
 import { env } from '../../config/env.js';
@@ -20,13 +23,31 @@ import { env } from '../../config/env.js';
 export async function handleImage(event) {
   const targetId = getSourceTargetId(event);
   try {
-    const quotaResult = await getSlipOkQuota();
-    if (quotaResult.quota <= 0) {
-      await pushSafe(targetId, buildFlexQuotaZero());
-      return; // stop flow entirely
+    const slipOKQuotaResult = await getSlipOkQuota();
+
+    if (slipOKQuotaResult.ok) {
+      if (slipOKQuotaResult.quota <= 0) {
+        await pushSafe(targetId, buildFlexSlipOKQuotaZero());
+        return; // stop flow entirely
+      }
+      if (slipOKQuotaResult.quota < env.SLIPOK_QUOTA_WARN_THRESHOLD) {
+        await pushSafe(targetId, buildFlexSlipOKQuotaLow());
+      }
     }
-    if (quotaResult.quota < env.SLIPOK_QUOTA_WARN_THRESHOLD) {
-      await pushSafe(targetId, buildFlexQuotaLow());
+
+    const lineMessagingAPIQuotaResult = await getLINEMessagingAPIQuota();
+
+    if (lineMessagingAPIQuotaResult.ok) {
+      if (lineMessagingAPIQuotaResult.quota <= 0) {
+        await pushSafe(targetId, buildFlexLINEMessagingAPIQuotaZero());
+        return; // stop flow entirely
+      }
+      if (
+        lineMessagingAPIQuotaResult.quota <
+        env.LINE_MESSAGING_API_QUOTA_WARN_THRESHOLD
+      ) {
+        await pushSafe(targetId, buildFlexLINEMessagingAPIQuotaLow());
+      }
     }
 
     const img = await downloadLineImage(event.message.id);
