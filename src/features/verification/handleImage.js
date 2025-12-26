@@ -2,7 +2,7 @@ import {
   getSourceTargetId,
   pushSafe,
   downloadLineImage,
-  getLINEMessagingAPIQuota,
+  getLINEMessagingAPIRemainingQuota,
 } from '../../services/lineClient.js';
 import {
   callSlipOkWithImage,
@@ -35,15 +35,16 @@ export async function handleImage(event) {
       }
     }
 
-    const lineMessagingAPIQuotaResult = await getLINEMessagingAPIQuota();
+    const lineMessagingAPIRemainingQuotaResult =
+      await getLINEMessagingAPIRemainingQuota();
 
-    if (lineMessagingAPIQuotaResult.ok) {
-      if (lineMessagingAPIQuotaResult.quota <= 0) {
+    if (lineMessagingAPIRemainingQuotaResult.ok) {
+      if (lineMessagingAPIRemainingQuotaResult.quota <= 0) {
         await pushSafe(targetId, buildFlexLINEMessagingAPIQuotaZero());
         return; // stop flow entirely
       }
       if (
-        lineMessagingAPIQuotaResult.quota <
+        lineMessagingAPIRemainingQuotaResult.quota <
         env.LINE_MESSAGING_API_QUOTA_WARN_THRESHOLD
       ) {
         await pushSafe(targetId, buildFlexLINEMessagingAPIQuotaLow());

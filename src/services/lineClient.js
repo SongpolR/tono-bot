@@ -30,15 +30,15 @@ export async function downloadLineImage(messageId) {
 }
 
 /**
- * Check LINE Messaging API quota.
+ * Check LINE Messaging API remaining quota.
  * API: GET https://api.line.me/v2/bot/message/quota
+ * API: GET https://api.line.me/v2/bot/message/quota/consumption
  * Auth: Bearer <LINE_CHANNEL_ACCESS_TOKEN>
- * Example response: { "type": "limited", "value": 300 }
+ * Example response: { "remaining": 300 }
  *
- * We assume "value" is the *remaining* quota.
  */
-export async function getLINEMessagingAPIQuota() {
-  const resp = await fetch('https://api.line.me/v2/bot/message/quota', {
+export async function getLINEMessagingAPIRemainingQuota() {
+  const respLimit = await fetch('https://api.line.me/v2/bot/message/quota', {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`,
@@ -46,19 +46,34 @@ export async function getLINEMessagingAPIQuota() {
     },
   });
 
-  let json = {};
+  let jsonLimit = {};
   try {
-    json = await resp.json();
+    jsonLimit = await respLimit.json();
+  } catch {}
+
+  const respConsume = await fetch(
+    'https://api.line.me/v2/bot/message/quota/consumption',
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${env.LINE_CHANNEL_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  let jsonConsume = {};
+  try {
+    jsonConsume = await respConsume.json();
   } catch {}
 
   // Normalize
-  const type = json?.type || 'limited';
-  const remaining = json?.value || 1000; // not returned when type is 'none'
+  const remaining = (jsonLimit?.value || 300) - (jsonConsume?.value || 300); // not returned when type is 'none'
 
   return {
-    ok: json.type && json.value,
-    type,
+    ok: jsonLimit.value && jsonConsume.totalUsage,
     remaining,
-    raw: json,
+    rawLimit: jsonLimit,
+    rawConsume: jsonConsume,
   };
 }
